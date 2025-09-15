@@ -1,0 +1,75 @@
+@use '@/scss/color';
+
+$mainContent: 1200px;
+$tablet: 768px;
+$phone: 480px;
+
+@mixin flex-box-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@mixin flex-box-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+@mixin text-shadow {
+  text-shadow: 0 2px 3px #747474, 1px 3px 4px #222, 0 8px 3px #474747, 0 11px 4px #747474;
+}
+
+@mixin text-overFlow($line: 1) {
+  display: -webkit-box;
+  -webkit-line-clamp: $line;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-all;
+  line-height: 1.4;
+  width: 100%;
+}
+@mixin media-desktop {
+  @media only screen and (max-width: $mainContent) {
+    @content;
+  }
+}
+
+@mixin media-tablet {
+  @media only screen and (max-width: $tablet) {
+    @content;
+  }
+}
+
+@mixin media-phone {
+  @media only screen and (max-width: $phone) {
+    @content;
+  }
+}
+
+@mixin media-query($width) {
+  @media only screen and (max-width: $width) {
+    @content;
+  }
+}
+
+@mixin tag-style {
+  display: inline-block;
+  margin: 0 6px 10px 0;
+  font-size: 14px;
+  background-color: #ffffff;
+  color: color.$grayFont;
+  border-radius: 18px;
+  border-radius: 8px;
+  padding: 8px 10px;
+  min-height: 34px;
+  border: none;
+  outline: none;
+}
+
+@mixin tag-active-style {
+  color: color.$white;
+  background-color: color.$brandColor_light;
+  border: none;
+}
