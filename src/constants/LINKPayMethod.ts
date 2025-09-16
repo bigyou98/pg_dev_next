@@ -153,25 +153,31 @@ export const CTS10617 = {
 export const CTS10618 = {
   // 신용카드_수기API(수기일반) : 카유비생
   CARDSUGI: {
-    PAYMETHOD: 'CARD-SUGI',
+    // 헤더 필수 값 --
     Authorization:
       'd4adef85d5a21c386f02b533fbb095ac976cff6de4d8be525d59b387f4f4c91e',
-    TYPE: 'P', // 결제방식(P:PC/M:모바일/W:웹뷰)
+    // --
+    // 바디 필수 값 --
     CPID: 'CTS10618',
+    PAYMETHOD: 'CARD-SUGI',
     ORDERNO: '20250908135359', // 주문번호
     PRODUCTTYPE: '1', // 	상품구분(1: 디지털, 2: 실물)
+    BILLTYPE: '13', // ! 얘 중요함과금 유형 , (1: 일반, 2: 월자동, 14:카드월자동 13:수기일반, 18:수기비인증)
     AMOUNT: '100', // 결제 금액
-    PRODUCTNAME: '상품명2', // 상품명
+    PRODUCTNAME: '상품명1', // 상품명
+    IPADDRESS: '192.168.55.27', // 고객 IP정보
     USERID: 'sh_park_user', // 고객 ID
-    BILLTYPE: '13', // ! 얘 중요함
-
-    // 카드 수기(수기일반) 필수 값
+    // --
+    // -- 타입별(CARD-SUGI)  필수 값
     CARDNO: '5118450016674199', // 카드번호
     EXPIREDT: '202904', //6 카드유효기간(YYYYMM)
+    QUOTA: '00', // 할부 개월(00~12)
+    TAXFREECD: '00', // 과세 비과세 여부      (00: 과세, 01: 비과세, 02: 복합)
     CARDAUTH: '980326', // 카드명의자 주민/사업자번호 , (과금유형 13,14인 경우에만 전송) , 주민 : YYMMDD 형식
     CARDPASSWORD: '98', // 카드명의자 비밀번호     (비밀번호 앞 2자리)     (과금유형 13,14인 경우에만 전송)
-    // QUOTA: '00', // 할부 개월(00~12)
-    // TAXFREECD: '00', // 과세 비과세 여부 (00: 과세, 01: 비과세, 02: 복합)
+    // --
+
+    // 카드 수기(수기일반) 필수 값
   },
 };
 
