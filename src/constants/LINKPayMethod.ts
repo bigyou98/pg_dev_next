@@ -183,19 +183,47 @@ export const CTS10618 = {
 
 export const CTS10619 = {
   // 신용카드_정기과금
-  CARDBATCH: {
-    PAYMETHOD: 'CARD-BATCH',
+  CARDKEYGEN: {
     Authorization:
       'a2f83ed706ece15c9c71d4dd78ae0035b9ba8971640d0be80012983be98c7a0c',
-    TYPE: 'P', // 결제방식(P:PC/M:모바일/W:웹뷰)
+
+    // 바디 필수 값 --
+    PAYMETHOD: 'CARD-KEYGEN',
+    CPID: 'CTS10619',
+    ORDERNO: '20250908135359', // 주문번호
+    BILLTYPE: '14', // ! 얘 중요함과금 유형 , (1: 일반, 2: 월자동, 14:카드월자동 13:수기일반, 18:수기비인증)
+    USERID: 'sh_park_user', // 고객 ID
+
+    // -- 타입별(CARD-KEYGEN)  필수 값
+    PRODUCTCODE: '123', // 상품코드
+    // AUTOKEY: '', // 월자동키
+    CARDNO: '5118450016674199', // 카드번호
+    EXPIREDT: '202904', //6 카드유효기간(YYYYMM)
+    CARDAUTH: '980326', // 카드명의자 주민/사업자번호 , (과금유형 13,14인 경우에만 전송) , 주민 : YYMMDD 형식
+    QUOTA: '00', // 할부개월 (DIRECT_YN 항목 Y일경우 필수)
+    TAXFREECD: '00', // 과세 비과세 여부     (00: 과세, 01: 비과세, 02: 복합)
+    DIRECT_YN: 'N', // 키 발행 후 과금 진행여부     (N: 미과금, Y:과금)
+  },
+  CARDBATCH: {
+    Authorization:
+      'a2f83ed706ece15c9c71d4dd78ae0035b9ba8971640d0be80012983be98c7a0c',
+
+    // 바디 필수 값 --
+    PAYMETHOD: 'CARD-BATCH',
     CPID: 'CTS10619',
     ORDERNO: '20250908135359', // 주문번호
     PRODUCTTYPE: '1', // 	상품구분(1: 디지털, 2: 실물)
+    BILLTYPE: '14', // ! 얘 중요함과금 유형 , (1: 일반, 2: 월자동, 14:카드월자동 13:수기일반, 18:수기비인증)
     AMOUNT: '100', // 결제 금액
-    PRODUCTNAME: '상품명', // 상품명
-    PRODUCTCODE: '1234', // 상품코드 : 월자동배치에만 필요함.
+    PRODUCTNAME: '상품명1', // 상품명
+    IPADDRESS: '192.168.55.27', // 고객 IP정보
     USERID: 'sh_park_user', // 고객 ID
-    // BILLTYPE: '1', // !  // 2: 월자동, 14:카드월자동
+
+    // -- 타입별(CARD-SUGI)  필수 값
+    PRODUCTCODE: '123', // 상품코드
+    QUOTA: '00', // 할부개월 (DIRECT_YN 항목 Y일경우 필수)
+    TAXFREECD: '00', // 과세 비과세 여부     (00: 과세, 01: 비과세, 02: 복합)
+    AUTOKEY: 'C20259G907186', // 월자동키
   },
 };
 

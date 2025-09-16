@@ -43,7 +43,6 @@ export async function POST(req: Request) {
     // customBody를 EUC-KR로 인코딩
     const encodedBody = iconv.encode(JSON.stringify(customBody), 'euc-kr');
 
-    console.log(readyRes.data.RETURNURL);
     console.log(customBody);
     const payRes = await axios.post<PaymentReadyResponse>(
       readyRes.data.RETURNURL,
