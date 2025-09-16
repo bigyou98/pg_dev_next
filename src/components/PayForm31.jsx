@@ -1,6 +1,6 @@
 'use client';
 
-import { linkENC } from '@/apis/linkENC';
+import { kiwoom } from '@/apis/kiwoom';
 import * as LINKPayMethods from '@/constants/LINKPayMethod';
 import {
   Alert,
@@ -47,7 +47,7 @@ const PayForm31 = () => {
     mutationFn: async formData => {
       console.log(formData);
       // 폼 데이터를 PaymentRequest 형태로 변환
-      return await linkENC.ready({
+      return await kiwoom.hash({
         PAYMETHOD: formData.PAYMETHOD,
         TYPE: formData.TYPE,
         CPID: formData.CPID,

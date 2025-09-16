@@ -15,11 +15,16 @@ export async function POST(
   try {
     const url = `${BASE_URL}/${(params.path || []).join('/')}`;
     const body = await req.json().catch(() => ({}));
+
+    const authHeader = req.headers.get('authorization');
     const response = await axios.post(url, body, {
       httpsAgent,
-      headers: { 'Content-Type': 'application/json' },
-      // headers: { 'Content-Type': 'application/json;charset=EUC-KR' },
+      headers: {
+        'Content-Type': 'application/json;charset=EUC-KR',
+        ...(authHeader ? { Authorization: authHeader } : {}),
+      },
     });
+
     return new Response(JSON.stringify(response.data), {
       status: response.status,
       headers: { 'Content-Type': 'application/json' },

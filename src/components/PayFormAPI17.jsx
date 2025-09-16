@@ -1,5 +1,6 @@
 'use client';
 
+import { kiwoom } from '@/apis/kiwoom';
 import * as LINKPayMethods from '@/constants/LINKPayMethod';
 import {
   Button,
@@ -43,13 +44,11 @@ const PayFormAPI17 = () => {
   const onSubmit = async e => {
     console.log(curPayment);
 
-    //   headers: {
-    //     'Content-Type': 'application/json;charset=EUC-KR',
-    //     Authorization: dummyData.Authorization,
-    //   },
-    // 1 : 레디
-
-    // 2 : api 날리기
+    try {
+      const res = await kiwoom.ready(curPayment);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const cancelMutation = useMutation(async data => {
