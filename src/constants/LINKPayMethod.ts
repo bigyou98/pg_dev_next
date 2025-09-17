@@ -142,8 +142,8 @@ export const CTS10617 = {
     USERID: 'sh_park_user', // 고객 ID
     // --
     // -- 타입별(CARD-SUGI)  필수 값
-    CARDNO: '5118450016674199', // 카드번호
-    EXPIREDT: '202904', //6 카드유효기간(YYYYMM)
+    CARDNO: process.env.NEXT_PUBLIC_CARD_NO || '', // 카드번호
+    EXPIREDT: process.env.NEXT_PUBLIC_CARD_EXPIRED_DATE || '', //6 카드유효기간(YYYYMM)
     QUOTA: '00', // 할부 개월(00~12)
     TAXFREECD: '00', // 과세 비과세 여부      (00: 과세, 01: 비과세, 02: 복합)
     // --
@@ -169,14 +169,13 @@ export const CTS10618 = {
     USERID: 'sh_park_user', // 고객 ID
     // --
     // -- 타입별(CARD-SUGI)  필수 값
-    CARDNO: '5118450016674199', // 카드번호
-    EXPIREDT: '202904', //6 카드유효기간(YYYYMM)
+    CARDNO: process.env.NEXT_PUBLIC_CARD_NO || '', // 카드번호
+    EXPIREDT: process.env.NEXT_PUBLIC_CARD_EXPIRED_DATE || '', //6 카드유효기간(YYYYMM)
     QUOTA: '00', // 할부 개월(00~12)
     TAXFREECD: '00', // 과세 비과세 여부      (00: 과세, 01: 비과세, 02: 복합)
-    CARDAUTH: '980326', // 카드명의자 주민/사업자번호 , (과금유형 13,14인 경우에만 전송) , 주민 : YYMMDD 형식
-    CARDPASSWORD: '98', // 카드명의자 비밀번호     (비밀번호 앞 2자리)     (과금유형 13,14인 경우에만 전송)
+    CARDAUTH: process.env.NEXT_PUBLIC_CARD_AUTH || '', // 카드명의자 주민/사업자번호 , (과금유형 13,14인 경우에만 전송) , 주민 : YYMMDD 형식
+    CARDPASSWORD: process.env.NEXT_PUBLIC_CARD_PASSWORD || '', // 카드명의자 비밀번호     (비밀번호 앞 2자리)     (과금유형 13,14인 경우에만 전송)
     // --
-
     // 카드 수기(수기일반) 필수 값
   },
 };
@@ -197,11 +196,11 @@ export const CTS10619 = {
     // -- 타입별(CARD-KEYGEN)  필수 값
     PRODUCTCODE: '123', // 상품코드
     // AUTOKEY: '', // 월자동키
-    CARDNO: '5118450016674199', // 카드번호
-    EXPIREDT: '202904', //6 카드유효기간(YYYYMM)
-    CARDAUTH: '980326', // 카드명의자 주민/사업자번호 , (과금유형 13,14인 경우에만 전송) , 주민 : YYMMDD 형식
-    QUOTA: '00', // 할부개월 (DIRECT_YN 항목 Y일경우 필수)
-    TAXFREECD: '00', // 과세 비과세 여부     (00: 과세, 01: 비과세, 02: 복합)
+    CARDNO: process.env.NEXT_PUBLIC_CARD_NO || '', // 카드번호
+    EXPIREDT: process.env.NEXT_PUBLIC_CARD_EXPIRED_DATE || '', //6 카드유효기간(YYYYMM)
+    CARDAUTH: process.env.NEXT_PUBLIC_CARD_AUTH || '', // 카드명의자 주민/사업자번호 , (과금유형 13,14인 경우에만 전송) , 주민 : YYMMDD 형식
+    QUOTA: '00', // 할부 개월(00~12)
+    TAXFREECD: '00', // 과세 비과세 여부      (00: 과세, 01: 비과세, 02: 복합)
     DIRECT_YN: 'N', // 키 발행 후 과금 진행여부     (N: 미과금, Y:과금)
   },
   CARDBATCH: {
@@ -221,8 +220,8 @@ export const CTS10619 = {
 
     // -- 타입별(CARD-SUGI)  필수 값
     PRODUCTCODE: '123', // 상품코드
-    QUOTA: '00', // 할부개월 (DIRECT_YN 항목 Y일경우 필수)
-    TAXFREECD: '00', // 과세 비과세 여부     (00: 과세, 01: 비과세, 02: 복합)
+    QUOTA: process.env.QUOTA || '00', // 할부개월 (DIRECT_YN 항목 Y일경우 필수)
+    TAXFREECD: process.env.TAX_FREE_CD || '00', // 과세 비과세 여부     (00: 과세, 01: 비과세, 02: 복합)
     AUTOKEY: 'C20259G907186', // 월자동키
   },
 };
