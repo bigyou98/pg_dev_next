@@ -1,5 +1,3 @@
-// app/api/payment/hash/route.ts
-import { CTS10616 } from '@/constants/LINKPayMethod';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {

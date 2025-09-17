@@ -40,6 +40,12 @@ export async function POST(req: Request) {
     // Authorization 키를 제거한 새 객체 생성 (구조분해 할당)
     const { Authorization, ...customBody } = body;
 
+    let qw = 1;
+    qw += 1;
+    qw += 1;
+
+    console.log(qw);
+
     // customBody를 EUC-KR로 인코딩
     const encodedBody = iconv.encode(JSON.stringify(customBody), 'euc-kr');
 
