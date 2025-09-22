@@ -10,8 +10,6 @@ type PaymentReadyResponse = {
   TOKEN: string;
 };
 
-const BASE_URL = 'https://apitest.kiwoompay.co.kr/pay';
-
 const httpsAgent =
   process.env.NODE_ENV === 'development'
     ? new https.Agent({ rejectUnauthorized: false })
@@ -19,11 +17,10 @@ const httpsAgent =
 
 export async function POST(req: Request) {
   try {
-    const readyUrl = BASE_URL + '/ready';
     const body = await req.json().catch(() => ({}));
 
     const readyRes = await axios.post<PaymentReadyResponse>(
-      readyUrl,
+      'https://apitest.kiwoompay.co.kr/pay/ready',
       {
         CPID: body.CPID,
         PAYMETHOD: body.PAYMETHOD,
@@ -40,16 +37,9 @@ export async function POST(req: Request) {
     // Authorization 키를 제거한 새 객체 생성 (구조분해 할당)
     const { Authorization, ...customBody } = body;
 
-    let qw = 1;
-    qw += 1;
-    qw += 1;
-
-    console.log(qw);
-
     // customBody를 EUC-KR로 인코딩
     const encodedBody = iconv.encode(JSON.stringify(customBody), 'euc-kr');
 
-    console.log(customBody);
     const payRes = await axios.post<PaymentReadyResponse>(
       readyRes.data.RETURNURL,
       encodedBody,
@@ -64,6 +54,8 @@ export async function POST(req: Request) {
       }
     );
 
+    console.log(readyRes.data);
+    console.log(payRes.data);
     return new Response(JSON.stringify(payRes.data), {
       status: payRes.status,
       headers: { 'Content-Type': 'application/json' },
@@ -71,6 +63,7 @@ export async function POST(req: Request) {
   } catch (error: any) {
     const status = error?.response?.status || 500;
     const data = error?.response?.data || { message: 'Proxy POST error' };
+    console.log(error);
     return new Response(JSON.stringify(data), {
       status,
       headers: { 'Content-Type': 'application/json' },

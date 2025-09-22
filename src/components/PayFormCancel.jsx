@@ -1,6 +1,7 @@
 'use client';
 
-import * as LINKPayMethods from '@/constants/LINKPayMethod';
+import { kiwoom } from '@/apis/kiwoom';
+import * as cancelPayMethods from '@/constants/cancelPayMethods';
 import {
   Button,
   FormControl,
@@ -8,11 +9,10 @@ import {
   NativeSelect,
   TextField,
 } from '@mui/material';
-import { useMutation } from '@tanstack/react-query';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
-const PayForm30 = () => {
+const PayFormCancel = () => {
   const {
     register,
     handleSubmit,
@@ -20,44 +20,36 @@ const PayForm30 = () => {
   } = useForm();
   const formRef = useRef();
 
-  const ctsKeys = Object.keys(LINKPayMethods);
-  const [selectedCtsKey, setSelectedCtsKey] = useState(
-    ctsKeys.includes('CTS10616') ? 'CTS10616' : ctsKeys[0]
-  );
+  const ctsKeys = Object.keys(cancelPayMethods);
 
-  const selectedCTS = useMemo(
-    () => LINKPayMethods[selectedCtsKey] || {},
+  // 선택된 CPID
+  const [selectedCtsKey, setSelectedCtsKey] = useState(ctsKeys[0]);
+
+  // CPID에 맵핑된 결제수단들
+  const selectedCTSMethods = useMemo(
+    () => cancelPayMethods[selectedCtsKey] || {},
     [selectedCtsKey]
   );
 
+  // 선택된 결제 수단
   const [curPayment, setCurPayment] = useState(() => {
-    const firstMethodKey = Object.keys(selectedCTS)[0];
-    return selectedCTS[firstMethodKey] || {};
+    const firstMethodKey = Object.keys(selectedCTSMethods)[0];
+    return selectedCTSMethods[firstMethodKey] || {};
   });
 
+  // init : 결제수단 0번째걸로 지정
   useEffect(() => {
-    const firstMethodKey = Object.keys(selectedCTS)[0];
-    setCurPayment(selectedCTS[firstMethodKey] || {});
-  }, [selectedCtsKey, selectedCTS]);
+    const firstMethodKey = Object.keys(selectedCTSMethods)[0];
+    setCurPayment(selectedCTSMethods[firstMethodKey] || {});
+  }, [selectedCtsKey, selectedCTSMethods]);
 
-  const onSubmit = async data => {
-    window.open('', 'KIWOOMPAY', 'width=468,height=750');
-    formRef.current.submit();
-  };
-
-  const cancelMutation = useMutation(async data => {
-    const response = await fetch('/api/cancelPay', {
-      method: 'POST',
-
-      body: JSON.stringify(data),
-    });
-
-    if (!response.ok) {
-      throw new Error('Network response was not ok');
+  const onSubmit = async () => {
+    try {
+      const res = await kiwoom.cancelPayment(curPayment);
+    } catch (error) {
+      console.log(error);
     }
-    console.log(response);
-    return response.json();
-  });
+  };
 
   return (
     <>
@@ -90,16 +82,16 @@ const PayForm30 = () => {
           PAYMENT METHOD
         </InputLabel>
         <NativeSelect
-          defaultValue={Object.keys(selectedCTS)[0]}
+          defaultValue={Object.keys(selectedCTSMethods)[0]}
           inputProps={{
             name: 'paymentMethod',
             id: 'uncontrolled-native',
           }}
           onChange={e => {
-            setCurPayment(selectedCTS[e.target.value]);
+            setCurPayment(selectedCTSMethods[e.target.value]);
           }}
         >
-          {Object.keys(selectedCTS).map(key => {
+          {Object.keys(selectedCTSMethods).map(key => {
             return (
               <option value={key} key={key + 'qweqwe'}>
                 {key}
@@ -109,11 +101,7 @@ const PayForm30 = () => {
         </NativeSelect>
       </FormControl>
 
-      <form
-        action="https://apitest.kiwoompay.co.kr/pay/link"
-        target="KIWOOMPAY"
-        method="post"
-        acceptCharset="EUC-KR" // ! 이거 중요함
+      <div
         style={{
           display: 'flex',
           flexDirection: 'column',
@@ -121,8 +109,6 @@ const PayForm30 = () => {
           gap: '16px',
           width: '100%',
         }}
-        onSubmit={handleSubmit(onSubmit)}
-        ref={formRef}
       >
         <div
           style={{
@@ -140,38 +126,42 @@ const PayForm30 = () => {
                 style={{ flex: 1, flexBasis: '201px' }}
                 label={key}
                 key={key}
-                value={curPayment[key]}
-                {...register(key)}
+                value={curPayment[key] ?? ''}
+                onChange={e => {
+                  setCurPayment(prev => ({
+                    ...prev,
+                    [key]: e.target.value,
+                  }));
+                }}
               />
             );
           })}
         </div>
+        <pre
+          style={{
+            width: '100%',
+            background: '#0f172a',
+            color: '#e2e8f0',
+            padding: '12px',
+            borderRadius: '8px',
+            overflowX: 'auto',
+          }}
+        >
+          {JSON.stringify(curPayment, null, 2)}
+        </pre>
         <Button
           variant="contained"
           type="submit"
           style={{
             width: '200px',
           }}
+          onClick={onSubmit}
         >
           결제
         </Button>
-      </form>
-
-      <h2>결제 취소</h2>
-      <Button
-        variant="contained"
-        type="submit"
-        style={{
-          width: '200px',
-        }}
-        onClick={() => {
-          cancelMutation.mutate();
-        }}
-      >
-        결제 취소
-      </Button>
+      </div>
     </>
   );
 };
 
-export default PayForm30;
+export default PayFormCancel;

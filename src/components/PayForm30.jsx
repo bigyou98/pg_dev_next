@@ -1,6 +1,6 @@
 'use client';
 
-import * as LINKPayMethods from '@/constants/LINKPayMethod';
+import * as payMethods from '@/constants/payMethods';
 import {
   Button,
   FormControl,
@@ -19,14 +19,14 @@ const PayForm30 = () => {
   } = useForm();
   const formRef = useRef();
 
-  const ctsKeys = Object.keys(LINKPayMethods).filter(key => key === 'CTS10616');
+  const ctsKeys = Object.keys(payMethods).filter(key => key === 'CTS10616');
 
   const [selectedCtsKey, setSelectedCtsKey] = useState(
     ctsKeys.includes('CTS10616') ? 'CTS10616' : ctsKeys[0]
   );
 
   const selectedCTS = useMemo(
-    () => LINKPayMethods[selectedCtsKey] || {},
+    () => payMethods[selectedCtsKey] || {},
     [selectedCtsKey]
   );
 
@@ -134,12 +134,30 @@ const PayForm30 = () => {
                 style={{ flex: 1, flexBasis: '201px' }}
                 label={key}
                 key={key}
-                value={curPayment[key]}
-                {...register(key)}
+                name={key}
+                value={curPayment[key] ?? ''}
+                onChange={e => {
+                  setCurPayment(prev => ({
+                    ...prev,
+                    [key]: e.target.value,
+                  }));
+                }}
               />
             );
           })}
         </div>
+        <pre
+          style={{
+            width: '100%',
+            background: '#0f172a',
+            color: '#e2e8f0',
+            padding: '12px',
+            borderRadius: '8px',
+            overflowX: 'auto',
+          }}
+        >
+          {JSON.stringify(curPayment, null, 2)}
+        </pre>
         <Button
           variant="contained"
           type="submit"

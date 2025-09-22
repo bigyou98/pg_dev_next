@@ -1,7 +1,7 @@
 'use client';
 
 import { kiwoom } from '@/apis/kiwoom';
-import * as LINKPayMethods from '@/constants/LINKPayMethod';
+import * as payMethods from '@/constants/payMethods';
 import {
   Button,
   FormControl,
@@ -9,7 +9,6 @@ import {
   NativeSelect,
   TextField,
 } from '@mui/material';
-import { useMutation } from '@tanstack/react-query';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
@@ -21,13 +20,13 @@ const PayFormAPI17 = () => {
   } = useForm();
   const formRef = useRef();
 
-  const ctsKeys = Object.keys(LINKPayMethods).filter(key => key !== 'CTS10616');
+  const ctsKeys = Object.keys(payMethods).filter(key => key !== 'CTS10616');
   const [selectedCtsKey, setSelectedCtsKey] = useState(
     ctsKeys.includes('CTS10616') ? 'CTS10616' : ctsKeys[0]
   );
 
   const selectedCTS = useMemo(
-    () => LINKPayMethods[selectedCtsKey] || {},
+    () => payMethods[selectedCtsKey] || {},
     [selectedCtsKey]
   );
 
@@ -45,25 +44,11 @@ const PayFormAPI17 = () => {
     console.log(curPayment);
 
     try {
-      const res = await kiwoom.ready(curPayment);
+      const res = await kiwoom.payment(curPayment);
     } catch (error) {
       console.log(error);
     }
   };
-
-  const cancelMutation = useMutation(async data => {
-    const response = await fetch('/api/cancelPay', {
-      method: 'POST',
-
-      body: JSON.stringify(data),
-    });
-
-    if (!response.ok) {
-      throw new Error('Network response was not ok');
-    }
-    console.log(response);
-    return response.json();
-  });
 
   return (
     <>
@@ -144,12 +129,29 @@ const PayFormAPI17 = () => {
                 style={{ flex: 1, flexBasis: '201px' }}
                 label={key}
                 key={key}
-                value={curPayment[key]}
-                {...register(key)}
+                value={curPayment[key] ?? ''}
+                onChange={e => {
+                  setCurPayment(prev => ({
+                    ...prev,
+                    [key]: e.target.value,
+                  }));
+                }}
               />
             );
           })}
         </div>
+        <pre
+          style={{
+            width: '100%',
+            background: '#0f172a',
+            color: '#e2e8f0',
+            padding: '12px',
+            borderRadius: '8px',
+            overflowX: 'auto',
+          }}
+        >
+          {JSON.stringify(curPayment, null, 2)}
+        </pre>
         <Button
           variant="contained"
           type="submit"

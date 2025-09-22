@@ -1,42 +1,70 @@
-import { NextRequest, NextResponse } from 'next/server';
+// iconv-lite 라이브러리가 필요합니다. 아래 명령어로 설치하세요:
+// npm install iconv-lite
 
-export async function POST(request: NextRequest) {
+import axios from 'axios';
+import https from 'https';
+import iconv from 'iconv-lite';
+
+type PaymentReadyResponse = {
+  RETURNURL: string;
+  TOKEN: string;
+};
+
+const httpsAgent =
+  process.env.NODE_ENV === 'development'
+    ? new https.Agent({ rejectUnauthorized: false })
+    : undefined;
+
+export async function POST(req: Request) {
   try {
-    // 클라이언트에서 요청한 JSON 데이터 파싱
-    const body = await request.json();
+    const { Authorization, ...reqData } = await req.json();
 
-    console.log('body로 들어온 값');
-    console.log(body);
-
-    // PG API로 요청 보내기
-    const response = await fetch('https://apitest.kiwoompay.co.kr/pay/ready', {
-      method: 'POST',
-      headers: {
-        // ? fetch에 'Content-Type': 'application/json; charset=EUC-KR' 헤더만 넣는다고 EUC-KR 포맷으로 변환되지 않음.
-        // ? EUC-KR 포맷이 필요한 경우 보낼 데이터를 직접 EUC-KR 바이트로 인코딩 후 body에 Uint8Array로 넘겨야 함.
-        'Content-Type': 'application/json; charset=EUC-KR',
-        Authorization:
-          'bdb9437ae28617818090109844fabe7e86da9bd5e21c298c07b14ceed8b39317',
+    const {
+      data: { RETURNURL, TOKEN },
+    } = await axios.post<PaymentReadyResponse>(
+      'https://apitest.kiwoompay.co.kr/pay/ready',
+      {
+        CPID: reqData.CPID,
+        PAYMETHOD: reqData.PAYMETHOD,
+        CANCELREQ: reqData.CANCELREQ,
       },
-      // body: JSON.stringify(body),
-      body: JSON.stringify({
-        CPID: 'CTS10616',
-        TRXID: '', // 승인거래번호
-        AMOUNT: '', // 금액
-        CANCELREASON: '상훈테스트', // 금액
-      }),
-    });
-
-    // PG API 응답 JSON 받기
-    const readyResult = await response.json();
-    console.log(readyResult);
-    // 클라이언트에 결과 리턴
-    return NextResponse.json(readyResult);
-  } catch (error) {
-    console.log(error);
-    return NextResponse.json(
-      { error: '상훈 서버 처리 중 오류 발생' },
-      { status: 500 }
+      {
+        httpsAgent,
+        headers: {
+          'Content-Type': 'application/json;charset=EUC-KR',
+          Authorization: Authorization,
+        },
+      }
     );
+
+    // reqData를 EUC-KR로 인코딩
+    const encodedBody = iconv.encode(JSON.stringify(reqData), 'euc-kr');
+
+    const payCancelRes = await axios.post<PaymentReadyResponse>(
+      RETURNURL,
+      encodedBody,
+      {
+        httpsAgent,
+        headers: {
+          'Content-Type': 'application/json;charset=EUC-KR',
+          Authorization: Authorization,
+          TOKEN: TOKEN,
+        },
+      }
+    );
+
+    console.log(payCancelRes.data);
+    return new Response(JSON.stringify(payCancelRes.data), {
+      status: payCancelRes.status,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  } catch (error: any) {
+    const status = error?.response?.status || 500;
+    const data = error?.response?.data || { message: 'Proxy POST error' };
+    console.log(error);
+    return new Response(JSON.stringify(data), {
+      status,
+      headers: { 'Content-Type': 'application/json' },
+    });
   }
 }
