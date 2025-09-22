@@ -1,4 +1,52 @@
 import { NextRequest } from 'next/server';
+import iconv from 'iconv-lite';
+
+function decodePercentEncodedToBuffer(input: string): Buffer {
+  // Convert + to space as per x-www-form-urlencoded semantics commonly used in query strings
+  const normalized = input.replace(/\+/g, ' ');
+  const bytes: number[] = [];
+  for (let i = 0; i < normalized.length; i++) {
+    const codeAtI = normalized.charCodeAt(i);
+    if (codeAtI === 37 /* '%' */ && i + 2 < normalized.length) {
+      const hex = normalized.substring(i + 1, i + 3);
+      const code = parseInt(hex, 16);
+      if (!Number.isNaN(code)) {
+        bytes.push(code);
+        i += 2;
+        continue;
+      }
+    }
+    // Fallback to ASCII byte of the character
+    bytes.push(codeAtI);
+  }
+  return Buffer.from(bytes);
+}
+
+function decodeEucKrPart(value: string): string {
+  if (value === undefined || value === null) return '';
+  try {
+    const buf = decodePercentEncodedToBuffer(value);
+    return iconv.decode(buf, 'euc-kr');
+  } catch (e) {
+    return value;
+  }
+}
+
+function parseEucKrQueryString(queryString: string): Record<string, string> {
+  const result: Record<string, string> = {};
+  if (!queryString) return result;
+  const pairs = queryString.split('&');
+  for (const pair of pairs) {
+    if (!pair) continue;
+    const eqIdx = pair.indexOf('=');
+    const rawKey = eqIdx >= 0 ? pair.slice(0, eqIdx) : pair;
+    const rawVal = eqIdx >= 0 ? pair.slice(eqIdx + 1) : '';
+    const key = decodeEucKrPart(rawKey);
+    const val = decodeEucKrPart(rawVal);
+    result[key] = val;
+  }
+  return result;
+}
 
 export async function GET(req: NextRequest) {
   console.log('=== SANGHOON NOTI API - GET REQUEST ===');
@@ -9,9 +57,15 @@ export async function GET(req: NextRequest) {
 
   console.log(req);
   // Query parameters
-  const { searchParams } = new URL(req.url);
-  const queryParams = Object.fromEntries(searchParams.entries());
-  console.log('Query Parameters:', queryParams);
+  const url = new URL(req.url);
+  const rawQuery = url.search.startsWith('?')
+    ? url.search.slice(1)
+    : url.search;
+  const utf8Parsed = Object.fromEntries(url.searchParams.entries());
+  const eucKrParsed = parseEucKrQueryString(rawQuery);
+  console.log('Raw Query String:', rawQuery);
+  console.log('Query Parameters (UTF-8 parsed):', utf8Parsed);
+  console.log('Query Parameters (EUC-KR decoded):', eucKrParsed);
 
   console.log('=== END GET REQUEST ===\n');
 
@@ -21,7 +75,8 @@ export async function GET(req: NextRequest) {
       message: 'GET request received',
       data: {
         method: req.method,
-        queryParams,
+        queryParamsUtf8: utf8Parsed,
+        queryParamsEucKr: eucKrParsed,
         timestamp: new Date().toISOString(),
       },
     }),
@@ -40,9 +95,15 @@ export async function POST(req: NextRequest) {
   console.log('Headers:', Object.fromEntries(req.headers.entries()));
 
   // Query parameters
-  const { searchParams } = new URL(req.url);
-  const queryParams = Object.fromEntries(searchParams.entries());
-  console.log('Query Parameters:', queryParams);
+  const url = new URL(req.url);
+  const rawQuery = url.search.startsWith('?')
+    ? url.search.slice(1)
+    : url.search;
+  const utf8Parsed = Object.fromEntries(url.searchParams.entries());
+  const eucKrParsed = parseEucKrQueryString(rawQuery);
+  console.log('Raw Query String:', rawQuery);
+  console.log('Query Parameters (UTF-8 parsed):', utf8Parsed);
+  console.log('Query Parameters (EUC-KR decoded):', eucKrParsed);
 
   // Request body
   let body = null;
@@ -79,7 +140,8 @@ export async function POST(req: NextRequest) {
       message: 'POST request received',
       data: {
         method: req.method,
-        queryParams,
+        queryParamsUtf8: utf8Parsed,
+        queryParamsEucKr: eucKrParsed,
         body,
         timestamp: new Date().toISOString(),
       },
